@@ -4,9 +4,7 @@ import { Vector2d } from "konva/lib/types";
 import KonvaShapeFactory from "../KonvaShapeFactory";
 
 
-
 function Stage (){
-    let paintMode = useRef(false)
     const mode = useRef<GlobalCompositeOperation>("source-over")
     let newLine = useRef(KonvaShapeFactory.Line({//
       points: [0, 0, 0, 0],
@@ -18,8 +16,8 @@ function Stage (){
     function addMouseUpEvent(stage: Konva.Stage){
       stage.off('mouseup')
         stage.on("mouseup", (e) => {
-             if (paintMode.current) {
-              paintMode.current = false;
+             if (paintMode) {
+              paintMode = false;
             }
           });
 
@@ -29,7 +27,7 @@ function Stage (){
         stage.on("mousedown", (e) => {
       
 
-            paintMode.current = true;
+            paintMode = true;
             var mouseDown = stage.getPointerPosition() as Vector2d;
             newLine.current = KonvaShapeFactory.Line({
               points: [mouseDown.x, mouseDown.y, mouseDown.x, mouseDown.y],
@@ -48,7 +46,7 @@ function Stage (){
     function addMouseMoveEvent(stage : Konva.Stage){
      
         stage.on("mousemove", (e) => {
-            if (paintMode.current) {
+            if (paintMode) {
               var tail = stage.getPointerPosition() as Vector2d;
               var lineTail = newLine.current.points().concat([tail.x, tail.y]);
               newLine.current.points(lineTail);
@@ -66,6 +64,8 @@ function Stage (){
         
 
     }
+    let paintMode = false
+
     function changeMode(e : React.ChangeEvent<HTMLSelectElement>){
         if (e.currentTarget.value==="eraser"){
             console.log("setting eraser")

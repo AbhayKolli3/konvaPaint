@@ -10,10 +10,7 @@ function App() {
 
   return (
     <div>
-      <select id="item">
-        <option value="paint">Paint</option>
-        <option value="eraser">Eraser</option>
-      </select>
+
       
 
       

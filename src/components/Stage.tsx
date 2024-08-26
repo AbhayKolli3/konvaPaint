@@ -1,100 +1,103 @@
 import Konva from "konva";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Vector2d } from "konva/lib/types";
 import KonvaShapeFactory from "../KonvaShapeFactory";
 
 
 
 function Stage (){
-    let paintMode = false;
-    let mode ="source-over"  as GlobalCompositeOperation
-
-    function changeMode(e : React.ChangeEvent<HTMLSelectElement>){
-        if (e.currentTarget.value==="eraser"){
-            mode="destination-out"
-
-        }
-        else{
-            mode="source-over"
-        }
-        
-
-
-    }
+    let paintMode = useRef(false)
+    const mode = useRef<GlobalCompositeOperation>("source-over")
+    let newLine = useRef(KonvaShapeFactory.Line({//
+      points: [0, 0, 0, 0],
+      stroke: "#df4b26",
+      strokeWidth: 5,
+      lineCap: "round",
+      lineJoin: "round",
+    }))
     function addMouseUpEvent(stage: Konva.Stage){
+      stage.off('mouseup')
         stage.on("mouseup", (e) => {
-            console.log("mouseup");
-            if (paintMode) {
-              paintMode = false;
+             if (paintMode.current) {
+              paintMode.current = false;
             }
           });
 
     }
-    function addMouseDownEvent(stage : Konva.Stage){
+    function addMouseDownEvent(stage : Konva.Stage,layer:Konva.Layer){
+      stage.off('mousedown')
         stage.on("mousedown", (e) => {
-            paintMode = true;
+      
+
+            paintMode.current = true;
             var mouseDown = stage.getPointerPosition() as Vector2d;
-            newLine = KonvaShapeFactory.Line({
+            newLine.current = KonvaShapeFactory.Line({
               points: [mouseDown.x, mouseDown.y, mouseDown.x, mouseDown.y],
               stroke:  "red" ,
-              globalCompositeOperation: mode,
+              globalCompositeOperation: mode.current,
               strokeWidth: 5,
               lineCap: "round",
               lineJoin: "round",
             });
-            layer.add(newLine);
+            layer.add(newLine.current);
           });
           
 
 
     }
     function addMouseMoveEvent(stage : Konva.Stage){
+     
         stage.on("mousemove", (e) => {
-            if (paintMode) {
+            if (paintMode.current) {
               var tail = stage.getPointerPosition() as Vector2d;
-              var lineTail = newLine.points().concat([tail.x, tail.y]);
-              newLine.points(lineTail);
+              var lineTail = newLine.current.points().concat([tail.x, tail.y]);
+              newLine.current.points(lineTail);
             }
           });
 
 
     }
 
-    function addEventListeners(stage : Konva.Stage){
+    function addEventListeners(stage : Konva.Stage,layer : Konva.Layer){
         addMouseUpEvent(stage)
         addMouseMoveEvent(stage)
-        addMouseDownEvent(stage)
+        addMouseDownEvent(stage,layer)
 
         
 
     }
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    const layer = new Konva.Layer();
-    let isPaint = false;
-    var newLine = KonvaShapeFactory.Line({
-        points: [0, 0, 0, 0],
-        stroke: "#df4b26",
-        strokeWidth: 5,
-        lineCap: "round",
-        lineJoin: "round",
-      });
-    useEffect(()=>{
+    function changeMode(e : React.ChangeEvent<HTMLSelectElement>){
+        if (e.currentTarget.value==="eraser"){
+            console.log("setting eraser")
+            mode.current="destination-out"
+        }
+        else{
+            console.log("setting brush")
+            mode.current="source-over"
+        }
 
-        const stage = new Konva.Stage({
+
+
+    }
+
+
+    useEffect(()=>{
+    const layer = new Konva.Layer();
+        
+          const stage = new Konva.Stage({
             container:"container",
-            width: width,
-            height: height - 25,
+            width: window.innerWidth,
+            height: window.innerHeight - 25,
           })
           stage.add(layer);
-          addEventListeners(stage)
+          addEventListeners(stage,layer)
         
 
-    })
+    },[])
 
     return(
         <div className="macPaint">
-                  <select id="item" onChange={(e)=>changeMode(e)}>
+        <select id="item" onChange={(e)=>changeMode(e)}>
         <option value="paint">Paint</option>
         <option value="eraser">Eraser</option>
       </select>

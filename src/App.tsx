@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Konva from "konva";
 import KonvaShapeFactory from "./KonvaShapeFactory";
 import { Vector2d } from "konva/lib/types";
-import Tool from "./components/Tool";
+import Stage from "./components/Stage";
 function App() {
+
 
 
   return (
@@ -13,9 +14,10 @@ function App() {
         <option value="paint">Paint</option>
         <option value="eraser">Eraser</option>
       </select>
-      <Tool />
+      
 
-      <div id="container" className="App"></div>
+      
+      <Stage/>
     </div>
   );
 }

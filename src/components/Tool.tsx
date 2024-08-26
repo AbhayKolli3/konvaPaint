@@ -54,7 +54,7 @@ class Tool extends React.Component{
         });
     }
     render(){
-        return <div>Painting</div>
+        return <></>
     }
 }
 
